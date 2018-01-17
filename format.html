@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="author" content="liyanan"/>
+    <title>html标签格式化</title>
+    <style>
+        body{
+            width:1200px;
+            margin:0 auto;
+            font-family:Microsoft YaHei;
+            font-size:14px;
+        }
+        a{
+            text-decoration:none;
+        }
+        textarea{
+            width:100%;
+            height:300px;
+        }
+        #btn,#select{
+            display:inline-block;
+            width:100px;
+            height:30px;
+            line-height:30px;
+            color:#fff;
+            background-color:#FF863E;
+            text-align:center;
+            margin:20px 0 0 0;
+        }
+        #btn:hover,#select:hover{
+            background-color:#FF6100;
+        }
+    </style>
+</head>
+<body>
+<p>贴入要格式化的HTML代码：</p>
+<textarea id="origin"></textarea>
+<br/>
+<a id="btn" href="javascript:;">开始格式化</a>
+<a id="select" href="javascript:;">复制</a>
+<p>格式化结果如下：</p>
+<textarea id="result"></textarea>
+</body>
+<script src="http://ui.yidaochn.com/theme/jquery2/jquery-2.1.4.min.js"></script>
+<script>
+    $(function(){
+        //开始格式化点击事件
+        $('#btn').click(function(){
+            var text=$('#origin').val();
+            var fmt=format(text);
+            $('#result').val(fmt);
+        });
+        //复制格式化结果
+        $('#select').click(function(){
+           $('#result').select();
+            document.execCommand("Copy");
+            alert("已复制好，可贴粘。");
+        });
+        //全选文本框内容
+        $('#origin,#result').focus(function(){
+            $(this).select();
+        });
+        function format(strs){
+            var left=null;
+            var right=null;
+            var str='';
+            var blank='\t';
+            var fmt=[];
+           for(var i=0;i<strs.length;i++){
+                if(strs[i]=='<'){
+                    left=i;
+                }else if(strs[i]=='>'){
+                    right=i;
+                }
+               if(typeof left=='number'&&typeof right=='number'){
+                   if(strs[left+1]=='/'){
+                       fmt.pop();
+                       str+=fmt.join('')+strs.slice(left,right+1);
+                   }else if(strs[right-1]=='/'){
+                       str+=fmt.join('')+strs.slice(left,right+1);
+                   }else if(strs.slice(left,right).search(/\<input|\<img|\<hr|\<br|\<link|\<meta/)!=-1){
+                       str+=fmt.join('')+strs.slice(left,right+1);
+                   }else{
+                       str+=fmt.join('')+strs.slice(left,right+1);
+                       fmt.push(blank);
+                   }
+                   for(var j=right;j<strs.length;j++){
+                       if(strs[j]=='<'){
+                           var s=strs.slice(right+1,j).replace(/\s*/g,'');
+                           if(s){
+                               str+=s;
+                           }
+                           break;
+                       }
+                   }
+                   str+='\n';
+                   left=null;
+                   right=null;
+               }
+
+           }
+            return str;
+        }
+
+    })
+</script>
+</html>
